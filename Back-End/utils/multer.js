@@ -1,0 +1,39 @@
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
+const { v4: uuidv4 } = require("uuid");
+const HttpError = require(".HttpError");
+
+const ALLOWED_MIME_TYPES = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+};
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadPath = "uploads/";
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+
+  filename: function (req, file, cb) {
+    const ext = ALLOWED_MIME_TYPES[file.mimetype];
+    cb(null, uuidv4() + ext);
+  },
+});
+
+const upload = multer({
+  storage,
+  fileFilter(req, file, cb) {
+    if (ALLOWED_MIME_TYPES[file.mimetype]) {
+      cb(null, true);
+    } else {
+      cb(new HttpError("Only JPEG, PNG, and WebP images are allowed.").BadRequest());
+    }
+  },
+});
+
+module.exports = upload;
