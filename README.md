@@ -204,3 +204,9 @@ Just as bees work together to build a thriving hive, Hive empowers people to bui
 ---
 
 > **Hive — Where Communities Connect.**
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
