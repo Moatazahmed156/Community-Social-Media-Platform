@@ -105,7 +105,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     expiresIn: "15m",
   });
 
-  const resetUrl = `http://localhost:1573/reset-password/${resetToken}`;
+  const resetUrl = `${CLIENT_URL}/reset-password/${resetToken}`;
 
   await sendMail(
     user.email,

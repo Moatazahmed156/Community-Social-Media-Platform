@@ -16,19 +16,25 @@ const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
 
+
 app.set("trust proxy", 1);
 
 // --- Security & core middleware ---
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 app.use(cors());
 app.use(compression());
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 
-if (NODE_ENV !== "development") {
+if (NODE_ENV !== "test") {
   app.use(morgan(NODE_ENV === "production" ? "combined" : "dev"));
 }
 
+// Basic rate limiting to slow down brute-force / abuse.
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 300,

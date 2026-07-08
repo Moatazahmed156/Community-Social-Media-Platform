@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   createGroup,
   listGroups,
+  getMyGroups,
   getGroupById,
   updateGroup,
   updateGroupLogo,
@@ -21,6 +22,7 @@ router.use(authenticate);
 
 router.post("/", createGroup);
 router.get("/", listGroups);
+router.get("/mine", getMyGroups);
 router.get("/:groupId", getGroupById);
 router.put("/:groupId", authorizeGroupRoles("owner", "admin"), updateGroup);
 router.put(

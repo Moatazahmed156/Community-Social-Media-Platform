@@ -119,9 +119,24 @@ const deleteGroup = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Group and its content deleted." });
 }, "Failed to delete group.");
 
+// @route  GET /api/groups/mine  (groups the current user belongs to)
+const getMyGroups = asyncHandler(async (req, res) => {
+  const memberships = await GroupMember.find({ userId: req.user._id }).populate("groupId");
+
+  const groups = memberships
+    .filter((m) => m.groupId)
+    .map((m) => ({
+      ...m.groupId.toObject(),
+      myRole: m.role,
+    }));
+
+  res.status(200).json({ groups });
+}, "Failed to fetch your groups.");
+
 module.exports = {
   createGroup,
   listGroups,
+  getMyGroups,
   getGroupById,
   updateGroup,
   updateGroupLogo,

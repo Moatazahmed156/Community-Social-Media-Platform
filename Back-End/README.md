@@ -117,5 +117,3 @@ uploads/         User-uploaded images (profiles/groups/posts), gitignored
 | DELETE | `/:id` | Delete a notification |
 
 Static uploaded files are served from `GET /uploads/<subfolder>/<filename>`.
-
-

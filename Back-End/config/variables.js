@@ -12,11 +12,12 @@ module.exports = {
   PORT: required("PORT", 5000),
 
   MONGODB_URI: required("MONGODB_URI"),
-  DB_NAME: process.env.DB_NAME ,
+  DB_NAME: process.env.DB_NAME,
 
   JWT_SECRET: required("JWT_SECRET"),
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d",
 
+  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:4200",
 
   EMAIL_USER: process.env.EMAIL_USER || "",
   EMAIL_PASS: process.env.EMAIL_PASS || "",
