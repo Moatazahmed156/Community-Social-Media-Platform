@@ -3,7 +3,13 @@ const GroupMember = require("../models/groupMembers-model");
 const authorizeGroupRoles = (...roles) => {
   return async (req, res, next) => {
     try {
-      const groupId = req.params.groupId;
+      const groupId = req.params.groupId || req.groupId;
+
+      if (!groupId) {
+        return res.status(400).json({
+          message: "Group could not be resolved for this request.",
+        });
+      }
 
       const membership = await GroupMember.findOne({
         groupId,

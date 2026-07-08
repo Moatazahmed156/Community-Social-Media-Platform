@@ -2,12 +2,14 @@ const fs = require("fs").promises;
 const path = require("path");
 const HttpError = require("./HttpError");
 
-const UPLOADS_DIR = path.resolve("uploads");
+const UPLOADS_ROOT = path.resolve("uploads");
 
-const safeUnlink = async (filename) => {
-  const safeName = path.basename(filename);
-  const resolved = path.resolve(UPLOADS_DIR, safeName);
-  if (!resolved.startsWith(UPLOADS_DIR + path.sep)) {
+const safeUnlink = async (storedPath) => {
+  if (!storedPath) return;
+  const relative = storedPath.replace(/^\/?uploads\/?/, "");
+  const resolved = path.resolve(UPLOADS_ROOT, relative);
+
+  if (!resolved.startsWith(UPLOADS_ROOT + path.sep)) {
     throw new HttpError("Invalid file path.").BadRequest();
   }
 
