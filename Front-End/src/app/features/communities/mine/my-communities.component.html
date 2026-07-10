@@ -1,0 +1,33 @@
+<div class="container-page">
+  <div class="page-header">
+    <div>
+      <h2>My Communities</h2>
+      <p>Communities you've joined or created.</p>
+    </div>
+    <button class="btn btn-primary" (click)="showCreateModal = true">+ Create Community</button>
+  </div>
+
+  @if (loading) {
+    <div class="grid">
+      @for (i of [1,2,3]; track i) {
+        <div class="skeleton" style="height: 170px;"></div>
+      }
+    </div>
+  } @else if (groups.length > 0) {
+    <div class="grid">
+      @for (group of groups; track group._id) {
+        <hv-community-card [group]="group" [myRole]="group.myRole" />
+      }
+    </div>
+  } @else {
+    <hv-empty-state icon="👥" title="You haven't joined any communities" subtitle="Explore communities to find one that fits.">
+      <a routerLink="/communities/explore" class="btn btn-primary">Explore Communities</a>
+    </hv-empty-state>
+  }
+</div>
+
+<hv-create-community-modal
+  [open]="showCreateModal"
+  (close)="showCreateModal = false"
+  (created)="onCreated($event)"
+/>

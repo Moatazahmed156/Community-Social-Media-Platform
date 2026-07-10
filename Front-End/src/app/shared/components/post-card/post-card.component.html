@@ -1,0 +1,151 @@
+<article class="post-card card card-hover fade-in">
+  <header class="post-header">
+    <hv-avatar
+      [src]="author?.profilePicture"
+      [firstName]="author?.firstName || ''"
+      [lastName]="author?.lastName || ''"
+      [size]="42"
+    />
+    <div class="post-header-text">
+      <div class="author-name">{{ author?.firstName }} {{ author?.lastName }}</div>
+      <div class="meta">
+        <span>&#64;{{ author?.username }}</span>
+        <span class="dot">&middot;</span>
+        <span>{{ post.createdAt | timeAgo }}</span>
+      </div>
+    </div>
+
+    @if (showModerationBadge && post.status !== 'approved') {
+      <span class="badge" [class.badge-pending]="post.status === 'pending'" [class.badge-rejected]="post.status === 'rejected'">
+        {{ post.status }}
+      </span>
+    }
+  </header>
+
+  @if (!editing) {
+    <p class="post-content">{{ post.content }}</p>
+  } @else {
+    <div class="edit-area">
+      <textarea class="input" rows="3" [(ngModel)]="editContent"></textarea>
+      <div class="edit-actions">
+        <button class="btn btn-secondary btn-sm" (click)="cancelEdit()">Cancel</button>
+        <button class="btn btn-primary btn-sm" [disabled]="submitting" (click)="saveEdit()">Save</button>
+      </div>
+    </div>
+  }
+
+  @if (post.images && post.images.length > 0) {
+    <div class="post-images" [class.grid-2]="post.images.length > 1">
+      @for (img of post.images; track img) {
+        <img [src]="img | fileUrl" alt="Post image" />
+      }
+    </div>
+  }
+
+  @if (summary && summary.total > 0) {
+    <div class="reaction-summary">
+      <span>{{ topReactionEmoji() }}</span>
+      <span>{{ summary.total }}</span>
+      <span class="dot">&middot;</span>
+      <span>{{ comments.length || '' }} {{ showComments ? 'comments shown' : '' }}</span>
+    </div>
+  }
+
+  <footer class="post-actions">
+    <div class="reaction-trigger-wrap">
+      <button
+        class="action-btn"
+        [class.active]="!!summary?.myReaction"
+        (click)="showReactionPicker = !showReactionPicker"
+      >
+        <span>{{ myReactionEmoji() || '👍' }}</span>
+        <span>React</span>
+      </button>
+
+      @if (showReactionPicker) {
+        <div class="reaction-picker fade-in">
+          @for (r of reactions; track r.type) {
+            <button (click)="react(r.type)" [class.active]="summary?.myReaction === r.type">{{ r.emoji }}</button>
+          }
+          @if (summary?.myReaction) {
+            <button class="remove-reaction" (click)="removeReaction()">✕</button>
+          }
+        </div>
+      }
+    </div>
+
+    <button class="action-btn" (click)="toggleComments()">
+      <span>💬</span><span>Comment</span>
+    </button>
+
+    @if (isAuthor && post.status === 'pending' && !editing) {
+      <button class="action-btn" (click)="startEdit()">
+        <span>✏️</span><span>Edit</span>
+      </button>
+    }
+
+    @if (isModerator && post.status === 'pending') {
+      <button class="action-btn approve" (click)="approve()">
+        <span>✅</span><span>Approve</span>
+      </button>
+      <button class="action-btn reject" (click)="reject()">
+        <span>🚫</span><span>Reject</span>
+      </button>
+    }
+
+    @if (canDelete) {
+      <button class="action-btn danger" (click)="remove()">
+        <span>🗑️</span><span>Delete</span>
+      </button>
+    }
+  </footer>
+
+  @if (showComments) {
+    <section class="comments fade-in">
+      @if (loadingComments) {
+        <div class="skeleton" style="height: 40px; margin-bottom: 8px;"></div>
+      } @else {
+        @for (comment of comments; track comment._id) {
+          <div class="comment-item">
+            <hv-avatar
+              [src]="commentAuthor(comment)?.profilePicture"
+              [firstName]="commentAuthor(comment)?.firstName || ''"
+              [lastName]="commentAuthor(comment)?.lastName || ''"
+              [size]="30"
+            />
+            <div class="comment-bubble">
+              <div class="comment-name">
+                {{ commentAuthor(comment)?.firstName }} {{ commentAuthor(comment)?.lastName }}
+              </div>
+              <div class="comment-text">{{ comment.content }}</div>
+              <div class="comment-meta">
+                <span>{{ comment.createdAt | timeAgo }}</span>
+                @if (canDeleteComment(comment)) {
+                  <button (click)="deleteComment(comment._id)">Delete</button>
+                }
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <p class="no-comments">No comments yet. Be the first to say something!</p>
+        }
+      }
+
+      <div class="comment-input-row">
+        <hv-avatar
+          [src]="currentUser?.profilePicture"
+          [firstName]="currentUser?.firstName || ''"
+          [lastName]="currentUser?.lastName || ''"
+          [size]="30"
+        />
+        <input
+          class="input"
+          placeholder="Write a comment..."
+          [(ngModel)]="newComment"
+          (keyup.enter)="submitComment()"
+        />
+        <button class="btn btn-primary btn-sm" (click)="submitComment()">Post</button>
+      </div>
+    </section>
+  }
+</article>

@@ -1,0 +1,98 @@
+<div class="container-page narrow">
+  <h2>Settings</h2>
+
+  <div class="settings-layout">
+    <nav class="settings-nav">
+      <button [class.active]="activeTab === 'account'" (click)="setTab('account')">👤 Account</button>
+      <button [class.active]="activeTab === 'security'" (click)="setTab('security')">🔒 Security</button>
+      <button [class.active]="activeTab === 'appearance'" (click)="setTab('appearance')">🎨 Appearance</button>
+      <button [class.active]="activeTab === 'notifications'" (click)="setTab('notifications')">🔔 Notifications</button>
+    </nav>
+
+    <div class="settings-panel">
+      @switch (activeTab) {
+        @case ('account') {
+          <div class="card">
+            <h3>Account Information</h3>
+            <p class="hint">Basic details tied to your account.</p>
+            <div class="info-row"><span>Email</span><strong>{{ auth.currentUser()?.email }}</strong></div>
+            <div class="info-row"><span>Username</span><strong>&#64;{{ auth.currentUser()?.username }}</strong></div>
+            <p class="hint">To edit your name, username, or bio, visit your <a routerLink="/profile">profile page</a>.</p>
+          </div>
+
+          <div class="card danger-zone">
+            <h3>Danger Zone</h3>
+            <p class="hint">Deleting your account is permanent and cannot be undone.</p>
+            <button class="btn btn-danger btn-sm" (click)="showDeleteConfirm = true">Delete Account</button>
+          </div>
+        }
+
+        @case ('security') {
+          <div class="card">
+            <h3>Change Password</h3>
+            <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+              <div class="field">
+                <label>Current password</label>
+                <input class="input" type="password" formControlName="currentPassword" />
+              </div>
+              <div class="field">
+                <label>New password</label>
+                <input class="input" type="password" formControlName="newPassword" />
+                @if (passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched) {
+                  <span class="error-text">Must be at least 6 characters.</span>
+                }
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm" [disabled]="savingPassword">
+                {{ savingPassword ? 'Saving...' : 'Update Password' }}
+              </button>
+            </form>
+          </div>
+        }
+
+        @case ('appearance') {
+          <div class="card">
+            <h3>Appearance</h3>
+            <p class="hint">Choose how Hive looks on this device.</p>
+            <div class="theme-toggle-row">
+              <div>
+                <strong>Dark Mode</strong>
+                <p class="hint">Comfortable viewing in low light.</p>
+              </div>
+              <button class="switch" [class.on]="theme.isDark()" (click)="theme.toggle()">
+                <span class="switch-knob"></span>
+              </button>
+            </div>
+          </div>
+        }
+
+        @case ('notifications') {
+          <div class="card">
+            <h3>Notification Preferences</h3>
+            <div class="theme-toggle-row">
+              <div><strong>Email notifications</strong><p class="hint">Get emailed about important updates.</p></div>
+              <button class="switch" [class.on]="emailNotifs" (click)="emailNotifs = !emailNotifs">
+                <span class="switch-knob"></span>
+              </button>
+            </div>
+            <div class="theme-toggle-row">
+              <div><strong>Push notifications</strong><p class="hint">Show in-app notification alerts.</p></div>
+              <button class="switch" [class.on]="pushNotifs" (click)="pushNotifs = !pushNotifs">
+                <span class="switch-knob"></span>
+              </button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>
+
+<hv-confirm-dialog
+  [open]="showDeleteConfirm"
+  title="Delete your account?"
+  message="This will permanently delete your account and profile. This cannot be undone."
+  confirmLabel="Delete Account"
+  [danger]="true"
+  (confirm)="deleteAccount()"
+  (cancel)="showDeleteConfirm = false"
+/>

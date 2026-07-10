@@ -1,0 +1,36 @@
+<div class="auth-card card fade-in">
+  <div class="auth-heading">
+    <h2>Welcome back</h2>
+    <p>Log in to keep up with your communities.</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="field">
+      <label for="identifier">Email or Username</label>
+      <input id="identifier" class="input" type="text" formControlName="identifier" placeholder="you&#64;example.com" />
+      @if (form.get('identifier')?.invalid && form.get('identifier')?.touched) {
+        <span class="error-text">This field is required.</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input id="password" class="input" type="password" formControlName="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" />
+      @if (form.get('password')?.invalid && form.get('password')?.touched) {
+        <span class="error-text">Password is required.</span>
+      }
+    </div>
+
+    <div class="forgot-link">
+      <a routerLink="/auth/forgot-password">Forgot password?</a>
+    </div>
+
+    <button type="submit" class="btn btn-primary submit-btn" [disabled]="submitting">
+      {{ submitting ? 'Logging in...' : 'Log In' }}
+    </button>
+  </form>
+
+  <div class="form-footer">
+    Don't have an account? <a routerLink="/auth/register">Sign up</a>
+  </div>
+</div>

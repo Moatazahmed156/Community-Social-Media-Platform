@@ -1,0 +1,30 @@
+@if (open) {
+  <div class="overlay" (click)="close.emit()">
+    <div class="dialog card fade-in" (click)="$event.stopPropagation()">
+      <h3>Create a Community</h3>
+      <p class="subtitle">Give your community a name and a short description.</p>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="field">
+          <label for="name">Community name</label>
+          <input id="name" class="input" type="text" formControlName="name" placeholder="e.g. Computer Science Club" />
+          @if (form.get('name')?.invalid && form.get('name')?.touched) {
+            <span class="error-text">Name is required.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="description">Description</label>
+          <textarea id="description" class="input" rows="3" formControlName="description" placeholder="What's this community about?"></textarea>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn btn-secondary" (click)="close.emit()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="submitting">
+            {{ submitting ? 'Creating...' : 'Create Community' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

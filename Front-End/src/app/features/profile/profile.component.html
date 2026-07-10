@@ -1,0 +1,60 @@
+<div class="cover-banner" [style.background-image]="auth.currentUser()?.coverPicture ? 'url(' + (auth.currentUser()?.coverPicture | fileUrl) + ')' : null">
+  <label class="cover-upload-btn">
+    📷 Change cover
+    <input type="file" accept="image/*" hidden (change)="uploadCover($event)" />
+  </label>
+</div>
+
+<div class="container-page profile-container">
+  <header class="profile-header">
+    <div class="avatar-block">
+      <hv-avatar
+        [src]="auth.currentUser()?.profilePicture"
+        [firstName]="auth.currentUser()?.firstName || ''"
+        [lastName]="auth.currentUser()?.lastName || ''"
+        [size]="100"
+      />
+      <label class="avatar-upload-btn">
+        ✏️
+        <input type="file" accept="image/*" hidden (change)="uploadAvatar($event)" />
+      </label>
+    </div>
+
+    <div class="profile-info">
+      @if (!editing) {
+        <h2>{{ auth.currentUser()?.firstName }} {{ auth.currentUser()?.lastName }}</h2>
+        <p class="username">&#64;{{ auth.currentUser()?.username }}</p>
+        @if (auth.currentUser()?.bio) {
+          <p class="bio">{{ auth.currentUser()?.bio }}</p>
+        }
+        <button class="btn btn-secondary btn-sm" (click)="startEdit()">Edit Profile</button>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="save()" class="edit-form">
+          <div class="name-row">
+            <input class="input" formControlName="firstName" placeholder="First name" />
+            <input class="input" formControlName="lastName" placeholder="Last name" />
+          </div>
+          <input class="input" formControlName="username" placeholder="Username" />
+          <textarea class="input" rows="2" formControlName="bio" placeholder="Tell us about yourself..."></textarea>
+          <div class="edit-actions">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="editing = false">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm" [disabled]="saving">Save</button>
+          </div>
+        </form>
+      }
+    </div>
+  </header>
+
+  <section class="communities-section">
+    <h3>Communities Joined ({{ myGroups.length }})</h3>
+    @if (myGroups.length > 0) {
+      <div class="grid">
+        @for (group of myGroups; track group._id) {
+          <hv-community-card [group]="group" [myRole]="group.myRole" />
+        }
+      </div>
+    } @else {
+      <p class="empty-text">No communities joined yet.</p>
+    }
+  </section>
+</div>

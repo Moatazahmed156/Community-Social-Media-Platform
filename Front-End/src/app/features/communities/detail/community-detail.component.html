@@ -1,0 +1,219 @@
+@if (loading) {
+  <div class="container-page">
+    <div class="skeleton" style="height: 180px; margin-bottom: 20px;"></div>
+    <div class="skeleton" style="height: 40px; width: 240px;"></div>
+  </div>
+} @else if (group) {
+  <div class="cover-banner" [style.background-image]="group.coverImage ? 'url(' + (group.coverImage | fileUrl) + ')' : null">
+    @if (isModerator) {
+      <label class="cover-upload-btn">
+        📷 Change cover
+        <input type="file" accept="image/*" hidden (change)="uploadCover($event)" />
+      </label>
+    }
+  </div>
+
+  <div class="container-page detail-container">
+    <header class="group-header">
+      <div class="logo-block">
+        @if (group.logo) {
+          <img [src]="group.logo | fileUrl" alt="" class="logo" />
+        } @else {
+          <div class="logo logo-fallback">{{ group.name[0] }}</div>
+        }
+        @if (isModerator) {
+          <label class="logo-upload-btn">
+            ✏️
+            <input type="file" accept="image/*" hidden (change)="uploadLogo($event)" />
+          </label>
+        }
+      </div>
+
+      <div class="header-info">
+        @if (!editingGroup) {
+          <h2>{{ group.name }}</h2>
+          <p class="description">{{ group.description || 'No description yet.' }}</p>
+          <div class="stats">
+            <span>{{ memberCount }} members</span>
+            @if (myRole) {
+              <span class="badge" [class]="'badge-' + myRole">{{ myRole }}</span>
+            }
+          </div>
+        } @else {
+          <form [formGroup]="editForm" (ngSubmit)="saveGroup()" class="edit-group-form">
+            <input class="input" formControlName="name" placeholder="Community name" />
+            <textarea class="input" rows="2" formControlName="description" placeholder="Description"></textarea>
+            <div class="edit-actions">
+              <button type="button" class="btn btn-secondary btn-sm" (click)="editingGroup = false">Cancel</button>
+              <button type="submit" class="btn btn-primary btn-sm" [disabled]="savingGroup">Save</button>
+            </div>
+          </form>
+        }
+      </div>
+
+      <div class="header-actions">
+        @if (!myRole) {
+          <button class="btn btn-primary" (click)="join()">Join Community</button>
+        } @else if (myRole !== 'owner') {
+          <button class="btn btn-secondary" (click)="showLeaveConfirm = true">Leave</button>
+        }
+
+        @if (isModerator && !editingGroup) {
+          <button class="btn btn-secondary" (click)="startEditGroup()">Edit</button>
+        }
+        @if (myRole === 'owner') {
+          <button class="btn btn-danger" (click)="showDeleteConfirm = true">Delete</button>
+        }
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button [class.active]="activeTab === 'posts'" (click)="setTab('posts')">Posts</button>
+      @if (isModerator) {
+        <button [class.active]="activeTab === 'pending'" (click)="setTab('pending')">
+          Pending @if (pendingPosts.length > 0) { <span class="tab-count">{{ pendingPosts.length }}</span> }
+        </button>
+      }
+      <button [class.active]="activeTab === 'members'" (click)="setTab('members')">Members</button>
+      <button [class.active]="activeTab === 'about'" (click)="setTab('about')">About</button>
+    </nav>
+
+    <div class="tab-content">
+      @if (!isMember) {
+        <hv-empty-state icon="🔒" title="Join to see the feed" subtitle="Become a member to view and share posts in this community.">
+          <button class="btn btn-primary" (click)="join()">Join Community</button>
+        </hv-empty-state>
+      } @else {
+        @switch (activeTab) {
+          @case ('posts') {
+            <div class="composer card">
+              <textarea
+                class="input"
+                rows="3"
+                placeholder="Share an update with the community..."
+                [(ngModel)]="newPostContent"
+              ></textarea>
+              <div class="composer-footer">
+                <label class="btn btn-ghost btn-sm">
+                  📎 Add images
+                  <input type="file" accept="image/*" multiple hidden (change)="onFileSelected($event)" />
+                </label>
+                @if (newPostFiles.length > 0) {
+                  <span class="file-count">{{ newPostFiles.length }} file(s) selected</span>
+                }
+                <button class="btn btn-primary btn-sm" [disabled]="posting || !newPostContent.trim()" (click)="submitPost()">
+                  {{ posting ? 'Posting...' : 'Post' }}
+                </button>
+              </div>
+              <p class="composer-hint">Posts are reviewed by an Owner or Admin before appearing in the feed.</p>
+            </div>
+
+            @if (postsLoading) {
+              <div class="skeleton" style="height: 140px; margin-bottom: 16px;"></div>
+            } @else if (posts.length > 0) {
+              @for (post of posts; track post._id) {
+                <hv-post-card
+                  [post]="post"
+                  [groupId]="groupId"
+                  [groupRole]="myRole"
+                  (updated)="onPostUpdatedInApproved($event)"
+                  (deleted)="onPostDeletedFromApproved($event)"
+                />
+              }
+            } @else {
+              <hv-empty-state icon="📝" title="No posts yet" subtitle="Be the first to share something with this community." />
+            }
+          }
+
+          @case ('pending') {
+            @if (postsLoading) {
+              <div class="skeleton" style="height: 140px;"></div>
+            } @else if (pendingPosts.length > 0) {
+              @for (post of pendingPosts; track post._id) {
+                <hv-post-card
+                  [post]="post"
+                  [groupId]="groupId"
+                  [groupRole]="myRole"
+                  (updated)="onPendingPostUpdated($event)"
+                  (deleted)="onPendingPostDeleted($event)"
+                />
+              }
+            } @else {
+              <hv-empty-state icon="✅" title="All caught up" subtitle="There are no posts awaiting review." />
+            }
+          }
+
+          @case ('members') {
+            @if (membersLoading) {
+              <div class="skeleton" style="height: 200px;"></div>
+            } @else {
+              <div class="members-list card">
+                @for (member of members; track member._id) {
+                  <div class="member-row">
+                    <hv-avatar
+                      [src]="memberUser(member)?.profilePicture"
+                      [firstName]="memberUser(member)?.firstName || ''"
+                      [lastName]="memberUser(member)?.lastName || ''"
+                      [size]="40"
+                    />
+                    <div class="member-info">
+                      <div class="member-name">{{ memberUser(member)?.firstName }} {{ memberUser(member)?.lastName }}</div>
+                      <div class="member-username">&#64;{{ memberUser(member)?.username }}</div>
+                    </div>
+                    <span class="badge" [class]="'badge-' + member.role">{{ member.role }}</span>
+
+                    @if (myRole === 'owner' && member.role !== 'owner') {
+                      <select class="role-select" [ngModel]="member.role" (ngModelChange)="changeMemberRole(member, $event)">
+                        <option value="member">Member</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    }
+
+                    @if (isModerator && member.role !== 'owner' && !(member.role === 'admin' && myRole !== 'owner')) {
+                      <button class="btn btn-ghost btn-sm" (click)="removeMember(member)">Remove</button>
+                    }
+                  </div>
+                } @empty {
+                  <p class="no-members">No members found.</p>
+                }
+              </div>
+            }
+          }
+
+          @case ('about') {
+            <div class="about-card card">
+              <h4>About this community</h4>
+              <p>{{ group.description || 'No description provided.' }}</p>
+              <ul class="about-facts">
+                <li><strong>{{ memberCount }}</strong> members</li>
+                @if (group.createdAt) {
+                  <li>Created {{ group.createdAt | timeAgo }}</li>
+                }
+              </ul>
+            </div>
+          }
+        }
+      }
+    </div>
+  </div>
+}
+
+<hv-confirm-dialog
+  [open]="showDeleteConfirm"
+  title="Delete this community?"
+  message="This will permanently delete the community and all of its posts. This cannot be undone."
+  confirmLabel="Delete"
+  [danger]="true"
+  (confirm)="deleteGroup()"
+  (cancel)="showDeleteConfirm = false"
+/>
+
+<hv-confirm-dialog
+  [open]="showLeaveConfirm"
+  title="Leave this community?"
+  message="You'll need to rejoin to see future posts."
+  confirmLabel="Leave"
+  [danger]="true"
+  (confirm)="confirmLeave()"
+  (cancel)="showLeaveConfirm = false"
+/>

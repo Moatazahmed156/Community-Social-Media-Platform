@@ -1,0 +1,51 @@
+.welcome {
+  margin-bottom: 28px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.welcome p {
+  color: var(--color-text-secondary);
+  font-size: 14.5px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.section-header h3 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.see-all {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary-hover);
+}
+
+.my-communities-strip {
+  margin-bottom: 32px;
+}
+
+.strip {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.strip-item {
+  flex: 0 0 260px;
+}
+
+.feed-section {
+  max-width: 640px;
+}

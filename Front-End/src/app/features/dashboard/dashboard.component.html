@@ -1,0 +1,60 @@
+<div class="container-page">
+  <section class="welcome fade-in">
+    <div>
+      <h2>Welcome back, {{ auth.currentUser()?.firstName }} 👋</h2>
+      <p>Here's what's happening across your communities.</p>
+    </div>
+    <button class="btn btn-primary" (click)="showCreateModal = true">+ Create Community</button>
+  </section>
+
+  <section class="my-communities-strip">
+    <div class="section-header">
+      <h3>My Communities</h3>
+      <a routerLink="/communities/mine" class="see-all">See all</a>
+    </div>
+
+    @if (myGroups.length > 0) {
+      <div class="strip scrollbar-thin">
+        @for (group of myGroups; track group._id) {
+          <div class="strip-item">
+            <hv-community-card [group]="group" [myRole]="group.myRole" />
+          </div>
+        }
+      </div>
+    } @else if (!loading) {
+      <hv-empty-state icon="👥" title="No communities yet" subtitle="Join or create a community to get started.">
+        <a routerLink="/communities/explore" class="btn btn-primary">Explore Communities</a>
+      </hv-empty-state>
+    }
+  </section>
+
+  <section class="feed-section">
+    <div class="section-header">
+      <h3>Latest Posts</h3>
+    </div>
+
+    @if (loading) {
+      <div class="skeleton" style="height: 140px; margin-bottom: 16px;"></div>
+      <div class="skeleton" style="height: 140px;"></div>
+    } @else if (feed.length > 0) {
+      @for (post of feed; track post._id) {
+        <hv-post-card
+          [post]="post"
+          [groupId]="post.groupId"
+          [groupRole]="groupRole(post)"
+          [showModerationBadge]="false"
+          (deleted)="onPostDeleted($event)"
+          (updated)="onPostChanged()"
+        />
+      }
+    } @else {
+      <hv-empty-state icon="📭" title="No posts to show" subtitle="Approved posts from your communities will show up here." />
+    }
+  </section>
+</div>
+
+<hv-create-community-modal
+  [open]="showCreateModal"
+  (close)="showCreateModal = false"
+  (created)="onCreated($event)"
+/>
