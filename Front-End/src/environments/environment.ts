@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5000/api',
-  fileBaseUrl: 'http://localhost:5000',
+  apiUrl: 'https://community-social-media-platform.onrender.com/api',
+  fileBaseUrl: 'https://community-social-media-platform.onrender.com',
 };
