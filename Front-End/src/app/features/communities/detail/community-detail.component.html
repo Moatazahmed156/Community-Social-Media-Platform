@@ -69,9 +69,10 @@
 
     <nav class="tabs">
       <button [class.active]="activeTab === 'posts'" (click)="setTab('posts')">Posts</button>
-      @if (isModerator) {
+      @if (isMember) {
         <button [class.active]="activeTab === 'pending'" (click)="setTab('pending')">
-          Pending @if (pendingPosts.length > 0) { <span class="tab-count">{{ pendingPosts.length }}</span> }
+          {{ isModerator ? 'Pending' : 'My Pending' }}
+          @if (pendingPosts.length > 0) { <span class="tab-count">{{ pendingPosts.length }}</span> }
         </button>
       }
       <button [class.active]="activeTab === 'members'" (click)="setTab('members')">Members</button>
@@ -139,7 +140,11 @@
                 />
               }
             } @else {
-              <hv-empty-state icon="✅" title="All caught up" subtitle="There are no posts awaiting review." />
+              <hv-empty-state
+                icon="✅"
+                [title]="isModerator ? 'All caught up' : 'Nothing pending'"
+                [subtitle]="isModerator ? 'There are no posts awaiting review.' : 'You have no posts awaiting review or that were rejected.'"
+              />
             }
           }
 

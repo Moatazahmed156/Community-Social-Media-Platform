@@ -2,7 +2,6 @@ import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GroupService } from '../../../core/services/group.service';
-import { ToastService } from '../../../core/services/toast.service';
 import { Group } from '../../../core/models/group.model';
 
 @Component({
@@ -19,7 +18,6 @@ export class CreateCommunityModalComponent {
 
   private fb = inject(FormBuilder);
   private groupService = inject(GroupService);
-  private toast = inject(ToastService);
 
   submitting = false;
 
@@ -43,7 +41,6 @@ export class CreateCommunityModalComponent {
       },
       error: () => {
         this.submitting = false;
-        this.toast.show('Could not create community.', 'error');
       },
     });
   }

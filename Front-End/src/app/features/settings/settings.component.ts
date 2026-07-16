@@ -8,7 +8,7 @@ import { ThemeService } from '../../core/services/theme.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 
-type SettingsTab = 'account' | 'security' | 'appearance' | 'notifications';
+type SettingsTab = 'account' | 'security' | 'appearance';
 
 @Component({
   selector: 'hv-settings',
@@ -27,9 +27,6 @@ export class SettingsComponent {
   activeTab: SettingsTab = 'account';
   savingPassword = false;
   showDeleteConfirm = false;
-
-  emailNotifs = true;
-  pushNotifs = true;
 
   passwordForm = this.fb.group({
     currentPassword: ['', Validators.required],
@@ -66,7 +63,6 @@ export class SettingsComponent {
       },
       error: () => {
         this.showDeleteConfirm = false;
-        this.toast.show('Could not delete account.', 'error');
       },
     });
   }

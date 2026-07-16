@@ -12,7 +12,7 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [CommonModule, CommunityCardComponent, CreateCommunityModalComponent, EmptyStateComponent, RouterModule],
   templateUrl: './my-communities.component.html',
-  styleUrl: '../explore/explore.component.scss',
+  styleUrl: './my-communities.component.scss',
 })
 export class MyCommunitiesComponent implements OnInit {
   private groupService = inject(GroupService);

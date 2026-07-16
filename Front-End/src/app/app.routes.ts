@@ -1,85 +1,74 @@
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './core/guards/auth.guard';
 
+import { AuthLayoutComponent } from './layout/auth-layout/auth-layout.component';
+import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+
+import { LoginComponent } from './features/auth/login/login.component';
+import { RegisterComponent } from './features/auth/register/register.component';
+import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './features/auth/reset-password/reset-password.component';
+
+import { DashboardComponent } from './features/dashboard/dashboard.component';
+import { MyCommunitiesComponent } from './features/communities/mine/my-communities.component';
+import { CommunityDetailComponent } from './features/communities/detail/community-detail.component';
+import { NotificationsComponent } from './features/notifications/notifications.component';
+import { ProfileComponent } from './features/profile/profile.component';
+import { SettingsComponent } from './features/settings/settings.component';
+
 export const routes: Routes = [
   {
     path: 'auth',
-    loadComponent: () =>
-      import('./layout/auth-layout/auth-layout.component').then((m) => m.AuthLayoutComponent),
+    component: AuthLayoutComponent,
     canActivate: [guestGuard],
     children: [
       { path: '', redirectTo: 'login', pathMatch: 'full' },
       {
         path: 'login',
-        loadComponent: () => import('./features/auth/login/login.component').then((m) => m.LoginComponent),
+        component: LoginComponent,
       },
       {
         path: 'register',
-        loadComponent: () =>
-          import('./features/auth/register/register.component').then((m) => m.RegisterComponent),
+        component: RegisterComponent,
       },
       {
         path: 'forgot-password',
-        loadComponent: () =>
-          import('./features/auth/forgot-password/forgot-password.component').then(
-            (m) => m.ForgotPasswordComponent
-          ),
+        component: ForgotPasswordComponent,
       },
       {
         path: 'reset-password/:token',
-        loadComponent: () =>
-          import('./features/auth/reset-password/reset-password.component').then(
-            (m) => m.ResetPasswordComponent
-          ),
+        component: ResetPasswordComponent,
       },
     ],
   },
   {
     path: '',
-    loadComponent: () =>
-      import('./layout/main-layout/main-layout.component').then((m) => m.MainLayoutComponent),
+    component: MainLayoutComponent,
     canActivate: [authGuard],
     children: [
       {
         path: '',
-        loadComponent: () =>
-          import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
-      },
-      {
-        path: 'communities/explore',
-        loadComponent: () =>
-          import('./features/communities/explore/explore.component').then((m) => m.ExploreComponent),
+        component: DashboardComponent,
       },
       {
         path: 'communities/mine',
-        loadComponent: () =>
-          import('./features/communities/mine/my-communities.component').then(
-            (m) => m.MyCommunitiesComponent
-          ),
+        component: MyCommunitiesComponent,
       },
       {
         path: 'communities/:groupId',
-        loadComponent: () =>
-          import('./features/communities/detail/community-detail.component').then(
-            (m) => m.CommunityDetailComponent
-          ),
+        component: CommunityDetailComponent,
       },
       {
         path: 'notifications',
-        loadComponent: () =>
-          import('./features/notifications/notifications.component').then(
-            (m) => m.NotificationsComponent
-          ),
+        component: NotificationsComponent,
       },
       {
         path: 'profile',
-        loadComponent: () =>
-          import('./features/profile/profile.component').then((m) => m.ProfileComponent),
+        component: ProfileComponent,
       },
       {
         path: 'settings',
-        loadComponent: () =>
-          import('./features/settings/settings.component').then((m) => m.SettingsComponent),
+        component: SettingsComponent,
       },
     ],
   },

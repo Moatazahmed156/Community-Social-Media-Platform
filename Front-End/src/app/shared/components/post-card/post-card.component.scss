@@ -78,6 +78,15 @@
   gap: 6px;
   font-size: 12.5px;
   color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .post-actions {
@@ -223,4 +232,89 @@
   .input {
     flex: 1;
   }
+}
+
+.reactions-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 17, 22, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1500;
+  padding: 16px;
+}
+
+.reactions-modal {
+  max-width: 380px;
+  width: 100%;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.reactions-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-border);
+
+  h4 {
+    margin: 0;
+    font-size: 15px;
+  }
+
+  .close-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    padding: 4px;
+
+    &:hover {
+      color: var(--color-heading);
+    }
+  }
+}
+
+.reactions-modal-list {
+  overflow-y: auto;
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reactions-modal-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 4px;
+  border-radius: var(--radius-sm);
+
+  &:hover {
+    background: var(--color-surface-hover);
+  }
+}
+
+.reactions-modal-name {
+  flex: 1;
+  min-width: 0;
+
+  .name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--color-heading);
+  }
+
+  .username {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+  }
+}
+
+.reactions-modal-emoji {
+  font-size: 18px;
 }

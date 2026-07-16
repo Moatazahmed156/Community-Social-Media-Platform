@@ -36,14 +36,21 @@ const listPosts = asyncHandler(async (req, res) => {
 
   const isModerator = ["owner", "admin"].includes(req.groupRole);
 
-  // Regular members only ever see approved posts. Moderators can filter
-  // by any status (default: everything) to review the moderation queue.
-  if (!isModerator) {
-    status = "approved";
-  }
-
   const filter = { groupId };
-  if (status) filter.status = status;
+
+  if (isModerator) {
+    // Moderators can filter by any status (default: everything) to review
+    // the moderation queue.
+    if (status) filter.status = status;
+  } else if (status === "pending" || status === "rejected") {
+    // Regular members can't see the group's full moderation queue, but they
+    // can look up their own pending/rejected posts so their submissions
+    // don't just disappear while awaiting review.
+    filter.status = status;
+    filter.authorId = req.user._id;
+  } else {
+    filter.status = "approved";
+  }
 
   const posts = await Post.find(filter)
     .populate("authorId", "firstName lastName username profilePicture")

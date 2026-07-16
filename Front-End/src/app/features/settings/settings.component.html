@@ -6,7 +6,6 @@
       <button [class.active]="activeTab === 'account'" (click)="setTab('account')">👤 Account</button>
       <button [class.active]="activeTab === 'security'" (click)="setTab('security')">🔒 Security</button>
       <button [class.active]="activeTab === 'appearance'" (click)="setTab('appearance')">🎨 Appearance</button>
-      <button [class.active]="activeTab === 'notifications'" (click)="setTab('notifications')">🔔 Notifications</button>
     </nav>
 
     <div class="settings-panel">
@@ -59,24 +58,6 @@
                 <p class="hint">Comfortable viewing in low light.</p>
               </div>
               <button class="switch" [class.on]="theme.isDark()" (click)="theme.toggle()">
-                <span class="switch-knob"></span>
-              </button>
-            </div>
-          </div>
-        }
-
-        @case ('notifications') {
-          <div class="card">
-            <h3>Notification Preferences</h3>
-            <div class="theme-toggle-row">
-              <div><strong>Email notifications</strong><p class="hint">Get emailed about important updates.</p></div>
-              <button class="switch" [class.on]="emailNotifs" (click)="emailNotifs = !emailNotifs">
-                <span class="switch-knob"></span>
-              </button>
-            </div>
-            <div class="theme-toggle-row">
-              <div><strong>Push notifications</strong><p class="hint">Show in-app notification alerts.</p></div>
-              <button class="switch" [class.on]="pushNotifs" (click)="pushNotifs = !pushNotifs">
                 <span class="switch-knob"></span>
               </button>
             </div>

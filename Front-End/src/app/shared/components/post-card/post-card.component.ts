@@ -58,6 +58,8 @@ export class PostCardComponent implements OnInit {
   editContent = '';
   submitting = false;
 
+  showReactionsModal = false;
+
   ngOnInit(): void {
     this.loadReactions();
   }
@@ -94,7 +96,7 @@ export class PostCardComponent implements OnInit {
     this.showReactionPicker = false;
     this.reactionService.set(this.post._id, type).subscribe({
       next: () => this.loadReactions(),
-      error: () => this.toast.show('Could not save your reaction.', 'error'),
+      error: () => {},
     });
   }
 
@@ -132,14 +134,14 @@ export class PostCardComponent implements OnInit {
         this.comments = [...this.comments, res.comment];
         this.newComment = '';
       },
-      error: () => this.toast.show('Could not post your comment.', 'error'),
+      error: () => {},
     });
   }
 
   deleteComment(commentId: string): void {
     this.commentService.delete(this.post._id, commentId).subscribe({
       next: () => (this.comments = this.comments.filter((c) => c._id !== commentId)),
-      error: () => this.toast.show('Could not delete comment.', 'error'),
+      error: () => {},
     });
   }
 
@@ -173,7 +175,6 @@ export class PostCardComponent implements OnInit {
       },
       error: () => {
         this.submitting = false;
-        this.toast.show('Could not update post.', 'error');
       },
     });
   }
@@ -184,7 +185,7 @@ export class PostCardComponent implements OnInit {
         this.updated.emit(res.post);
         this.toast.show('Post approved.', 'success');
       },
-      error: () => this.toast.show('Could not approve post.', 'error'),
+      error: () => {},
     });
   }
 
@@ -195,7 +196,7 @@ export class PostCardComponent implements OnInit {
         this.updated.emit(res.post);
         this.toast.show('Post rejected.', 'info');
       },
-      error: () => this.toast.show('Could not reject post.', 'error'),
+      error: () => {},
     });
   }
 
@@ -206,7 +207,7 @@ export class PostCardComponent implements OnInit {
         this.deleted.emit(this.post._id);
         this.toast.show('Post deleted.', 'success');
       },
-      error: () => this.toast.show('Could not delete post.', 'error'),
+      error: () => {},
     });
   }
 
@@ -221,5 +222,18 @@ export class PostCardComponent implements OnInit {
   myReactionEmoji(): string {
     if (!this.summary?.myReaction) return '';
     return this.reactions.find((r) => r.type === this.summary!.myReaction)?.emoji ?? '';
+  }
+
+  emojiFor(type: ReactionType): string {
+    return this.reactions.find((r) => r.type === type)?.emoji ?? '';
+  }
+
+  reactionUser(reaction: ReactionSummary['reactions'][number]): User | null {
+    return typeof reaction.userId === 'object' ? reaction.userId : null;
+  }
+
+  openReactionsModal(): void {
+    if (!this.summary || this.summary.total === 0) return;
+    this.showReactionsModal = true;
   }
 }

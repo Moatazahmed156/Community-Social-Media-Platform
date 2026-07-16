@@ -91,7 +91,6 @@ export class SidebarComponent {
   navItems: NavItem[] = [
     { label: 'Home', icon: '🏠', path: '/' },
     { label: 'My Communities', icon: '👥', path: '/communities/mine' },
-    // { label: 'Explore Communities', icon: '🧭', path: '/communities/explore' },
     { label: 'Notifications', icon: '🔔', path: '/notifications' },
     { label: 'Profile', icon: '👤', path: '/profile' },
     { label: 'Settings', icon: '⚙️', path: '/settings' },

@@ -67,7 +67,6 @@ export class ProfileComponent implements OnInit {
       },
       error: () => {
         this.saving = false;
-        this.toast.show('Could not update profile.', 'error');
       },
     });
   }
@@ -80,7 +79,7 @@ export class ProfileComponent implements OnInit {
         this.auth.updateLocalUser(res.user);
         this.toast.show('Profile picture updated.', 'success');
       },
-      error: () => this.toast.show('Could not upload image.', 'error'),
+      error: () => {},
     });
   }
 
@@ -92,7 +91,7 @@ export class ProfileComponent implements OnInit {
         this.auth.updateLocalUser(res.user);
         this.toast.show('Cover photo updated.', 'success');
       },
-      error: () => this.toast.show('Could not upload image.', 'error'),
+      error: () => {},
     });
   }
 }

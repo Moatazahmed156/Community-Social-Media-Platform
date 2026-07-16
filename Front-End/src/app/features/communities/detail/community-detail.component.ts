@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { GroupService } from '../../../core/services/group.service';
 import { PostService } from '../../../core/services/post.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -103,7 +104,6 @@ export class CommunityDetailComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        this.toast.show('Community not found.', 'error');
         this.router.navigate(['/communities/explore']);
       },
     });
@@ -129,9 +129,30 @@ export class CommunityDetailComponent implements OnInit {
 
   loadPending(): void {
     this.postsLoading = true;
-    this.postService.list(this.groupId, 'pending', 1, 50).subscribe({
-      next: (res) => {
-        this.pendingPosts = res.posts;
+
+    if (this.isModerator) {
+      // Moderators review the whole group's queue.
+      this.postService.list(this.groupId, 'pending', 1, 50).subscribe({
+        next: (res) => {
+          this.pendingPosts = res.posts;
+          this.postsLoading = false;
+        },
+        error: () => (this.postsLoading = false),
+      });
+      return;
+    }
+
+    // Regular members only ever get back their own pending/rejected posts,
+    // so their submissions stay visible (and editable while pending)
+    // instead of disappearing until a moderator acts on them.
+    forkJoin({
+      pending: this.postService.list(this.groupId, 'pending', 1, 50),
+      rejected: this.postService.list(this.groupId, 'rejected', 1, 50),
+    }).subscribe({
+      next: ({ pending, rejected }) => {
+        this.pendingPosts = [...pending.posts, ...rejected.posts].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
         this.postsLoading = false;
       },
       error: () => (this.postsLoading = false),
@@ -157,7 +178,7 @@ export class CommunityDetailComponent implements OnInit {
         this.toast.show('Joined the community!', 'success');
         this.loadPosts();
       },
-      error: () => this.toast.show('Could not join community.', 'error'),
+      error: () => {},
     });
   }
 
@@ -171,7 +192,6 @@ export class CommunityDetailComponent implements OnInit {
       },
       error: () => {
         this.showLeaveConfirm = false;
-        this.toast.show('Could not leave community.', 'error');
       },
     });
   }
@@ -190,11 +210,10 @@ export class CommunityDetailComponent implements OnInit {
         this.newPostContent = '';
         this.newPostFiles = [];
         this.toast.show('Post submitted for approval.', 'success');
-        if (this.isModerator) this.loadPending();
+        this.loadPending();
       },
       error: () => {
         this.posting = false;
-        this.toast.show('Could not submit post.', 'error');
       },
     });
   }
@@ -233,7 +252,7 @@ export class CommunityDetailComponent implements OnInit {
         member.role = role;
         this.toast.show('Member role updated.', 'success');
       },
-      error: () => this.toast.show('Could not update role.', 'error'),
+      error: () => {},
     });
   }
 
@@ -246,7 +265,7 @@ export class CommunityDetailComponent implements OnInit {
         this.memberCount = Math.max(0, this.memberCount - 1);
         this.toast.show('Member removed.', 'success');
       },
-      error: () => this.toast.show('Could not remove member.', 'error'),
+      error: () => {},
     });
   }
 
@@ -266,7 +285,6 @@ export class CommunityDetailComponent implements OnInit {
       },
       error: () => {
         this.savingGroup = false;
-        this.toast.show('Could not update community.', 'error');
       },
     });
   }
@@ -280,7 +298,7 @@ export class CommunityDetailComponent implements OnInit {
         this.group = res.group;
         this.toast.show('Logo updated.', 'success');
       },
-      error: () => this.toast.show('Could not upload logo.', 'error'),
+      error: () => {},
     });
   }
 
@@ -293,7 +311,7 @@ export class CommunityDetailComponent implements OnInit {
         this.group = res.group;
         this.toast.show('Cover image updated.', 'success');
       },
-      error: () => this.toast.show('Could not upload cover.', 'error'),
+      error: () => {},
     });
   }
 
@@ -305,7 +323,6 @@ export class CommunityDetailComponent implements OnInit {
       },
       error: () => {
         this.showDeleteConfirm = false;
-        this.toast.show('Could not delete community.', 'error');
       },
     });
   }

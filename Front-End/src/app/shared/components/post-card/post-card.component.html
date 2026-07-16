@@ -43,12 +43,12 @@
   }
 
   @if (summary && summary.total > 0) {
-    <div class="reaction-summary">
+    <button type="button" class="reaction-summary" (click)="openReactionsModal()">
       <span>{{ topReactionEmoji() }}</span>
       <span>{{ summary.total }}</span>
       <span class="dot">&middot;</span>
       <span>{{ comments.length || '' }} {{ showComments ? 'comments shown' : '' }}</span>
-    </div>
+    </button>
   }
 
   <footer class="post-actions">
@@ -149,3 +149,34 @@
     </section>
   }
 </article>
+
+@if (showReactionsModal) {
+  <div class="reactions-modal-overlay" (click)="showReactionsModal = false">
+    <div class="reactions-modal card fade-in" (click)="$event.stopPropagation()">
+      <header class="reactions-modal-header">
+        <h4>Reactions &middot; {{ summary?.total }}</h4>
+        <button type="button" class="close-btn" (click)="showReactionsModal = false">✕</button>
+      </header>
+
+      <div class="reactions-modal-list">
+        @for (reaction of summary?.reactions ?? []; track reaction._id) {
+          <div class="reactions-modal-row">
+            <hv-avatar
+              [src]="reactionUser(reaction)?.profilePicture"
+              [firstName]="reactionUser(reaction)?.firstName || ''"
+              [lastName]="reactionUser(reaction)?.lastName || ''"
+              [size]="36"
+            />
+            <div class="reactions-modal-name">
+              <div class="name">{{ reactionUser(reaction)?.firstName }} {{ reactionUser(reaction)?.lastName }}</div>
+              <div class="username">&#64;{{ reactionUser(reaction)?.username }}</div>
+            </div>
+            <span class="reactions-modal-emoji">{{ emojiFor(reaction.type) }}</span>
+          </div>
+        } @empty {
+          <p class="no-comments">No reactions yet.</p>
+        }
+      </div>
+    </div>
+  </div>
+}
